@@ -37,10 +37,12 @@ function App() {
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        for (const [key, value] of params.entries()) {
-            console.log(key, `${value}`)
-            localStorage.setItem(key, `${value}`);
-            window.location.href = process.env.REACT_APP_WEB_CLIENT_REDIRECT_URL
+        if (params) {
+            for (const [key, value] of params.entries()) {
+                console.log(key, `${value}`)
+                localStorage.setItem(key, `${value}`);
+                window.location.href = process.env.REACT_APP_WEB_CLIENT_REDIRECT_URL
+            }
         }
     }, []);
 
