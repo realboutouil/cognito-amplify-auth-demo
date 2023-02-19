@@ -37,7 +37,8 @@ function App() {
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        if (params) {
+        const redirect = params.get("redirect");
+        if (redirect && redirect === "true") {
             for (const [key, value] of params.entries()) {
                 console.log(key, `${value}`)
                 localStorage.setItem(key, `${value}`);
@@ -69,8 +70,10 @@ function App() {
     }
 
     function redirectToOtherPlatform() {
-        const url = new URL(window.location.origin);
-        url.search = new URLSearchParams(session);
+        const url = new URL(window.location.origin + '/signin');
+        const params = new URLSearchParams(session);
+        params.set("redirect", "true");
+        url.search = params;
         return url.toString();
     }
 
