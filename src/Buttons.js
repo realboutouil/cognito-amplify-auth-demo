@@ -4,12 +4,20 @@ import {FcGoogle} from "react-icons/fc";
 import {FaEnvelope} from "react-icons/fa";
 import {CgFacebook} from "react-icons/cg";
 import {IoLogoAmplify} from "react-icons/io5";
+import {SiOkta} from "react-icons/si";
 import "./App.css";
 
 function Buttons(props) {
     return (
         <div>
             <div style={styles.container}>
+                <button
+                    style={{...styles.button, ...styles.facebook}}
+                    onClick={() => Auth.federatedSignIn({provider: "Okta"})}
+                >
+                    <SiOkta color="#3C5997" size="1.8em" style={{...styles.social_logo}}/>
+                    <p style={styles.text}>Sign in with Okta</p>
+                </button>
                 <button
                     style={{...styles.button, ...styles.facebook}}
                     onClick={() => Auth.federatedSignIn({provider: "Facebook"})}

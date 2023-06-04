@@ -33,19 +33,33 @@ function App() {
         if (!window.location.search.includes("?signedin=true")) {
             checkUser(dispatch);
         }
+        // Refresh session when component mounts
+        refreshSession();
     }, []);
 
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get("redirect");
-        if (redirect && redirect === "true") {
-            for (const [key, value] of params.entries()) {
-                console.log(key, `${value}`)
-                localStorage.setItem(key, `${value}`);
-                window.location.href = process.env.REACT_APP_WEB_CLIENT_REDIRECT_URL
+    async function refreshSession() {
+        try {
+            const session = await Auth.currentSession();
+            const idTokenExpire = session.getIdToken().getExpiration();
+            const refreshToken = session.getRefreshToken();
+            const currentTimeSeconds = Math.round(+new Date() / 1000);
+            if (idTokenExpire < currentTimeSeconds) {
+                const user = await Auth.currentAuthenticatedUser();
+                user.refreshSession(refreshToken, (err, session) => {
+                    if (err) {
+                        console.log(err);
+                        if (err === 'Token expired') {
+                            Auth.signOut();
+                        }
+                    } else {
+                        console.log('Session refreshed with ID token: ', session.getIdToken());
+                    }
+                });
             }
+        } catch (err) {
+            console.log(err);
         }
-    }, []);
+    }
 
     // This renders the custom form
     if (formState === "email") {
@@ -69,14 +83,6 @@ function App() {
         }
     }
 
-    function redirectToOtherPlatform() {
-        const url = new URL(window.location.origin + '/signin');
-        const params = new URLSearchParams(session);
-        params.set("redirect", "true");
-        url.search = params;
-        return url.toString();
-    }
-
     return (
         <div style={styles.appContainer}>
             <Header updateFormState={updateFormState}/>
@@ -93,7 +99,22 @@ function App() {
                     <h4>
                         Welcome {userState.user.signInUserSession.idToken.payload.email}
                     </h4>
-                    <a href={redirectToOtherPlatform()}>Go to Other Platform</a>
+                    <div>
+                        <h5>
+                            Access Token:
+                        </h5>
+                        <code>
+                            {userState.user.signInUserSession.accessToken.jwtToken}
+                        </code>
+                    </div>
+                    <div>
+                        <h5>
+                            Refresh Token:
+                        </h5>
+                        <code>
+                            {userState.user.signInUserSession.refreshToken.token}
+                        </code>
+                    </div>
                     <button
                         style={{...styles.button, ...styles.signOut}}
                         onClick={signOut}

@@ -14,6 +14,7 @@ post [The Complete Guide to User Authentication with the Amplify Framework](http
 Auth.federatedSignIn();
 
 // specify OAuth provider (Buttons.js)
+Auth.federatedSignIn({provider: "Okta"});
 Auth.federatedSignIn({provider: "Facebook"});
 Auth.federatedSignIn({provider: "Google"});
 
